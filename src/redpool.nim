@@ -2,11 +2,11 @@ import asyncdispatch, times, net
 import redis
 
 type
-  RedisConn* = ref object
-    conn*: AsyncRedis
+  RedisConn = ref object
+    conn: AsyncRedis
     taken: float
 
-  RedisPool* = ref object
+  RedisPool = ref object
     conns: seq[RedisConn]
     host: string
     port: Port
