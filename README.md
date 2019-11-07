@@ -5,7 +5,9 @@ Simple Redis connection pool.
 The `timeout` argument allows connections to be reused after a given time, in
 case they don't get released properly. The `maxConn` argument sets a soft
 limit, which destroys connection objects when released if the limit has been
-reached.
+reached. The `withAcquire` template can be used to automatically acquire and
+release a connection, but note the `acquire` call is `waitFor`'d since `async`
+isn't yet allowed inside templates and macros.
 
 # Usage
 
@@ -17,4 +19,7 @@ proc main {.async.} =
   let conn = await pool.acquire()
   echo await conn.ping()
   pool.release(conn)
+
+  pool.withAcquire(conn2):
+    echo await conn2.ping()
 ```

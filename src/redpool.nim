@@ -51,11 +51,21 @@ proc release*(pool: RedisPool; conn: AsyncRedis) =
         rconn.taken = 0
       break
 
+template withAcquire*(pool: RedisPool; conn, body: untyped) =
+  let `conn` {.inject.} = waitFor pool.acquire()
+  try:
+    body
+  finally:
+    pool.release(`conn`)
+
 when isMainModule:
   proc main {.async.} =
     let pool = await newRedisPool(1)
     let conn = await pool.acquire()
     echo await conn.ping()
     pool.release(conn)
+
+    pool.withAcquire(conn2):
+      echo await conn2.ping()
 
   waitFor main()
