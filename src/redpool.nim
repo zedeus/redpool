@@ -5,7 +5,6 @@ type
   RedisConn* = ref object
     conn*: AsyncRedis
     taken: float
-    id: int
 
   RedisPool* = ref object
     conns: seq[RedisConn]
@@ -13,13 +12,10 @@ type
     port: Port
     timeout: float
     maxConns: int
-    counter: int
 
 proc newRedisConn(pool: RedisPool; taken=false): Future[RedisConn] {.async.} =
-  inc pool.counter
   result = RedisConn(
     conn: await openAsync(pool.host, pool.port),
-    id: pool.counter,
     taken: if taken: epochTime() else: 0
   )
 
