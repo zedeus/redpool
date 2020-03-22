@@ -6,7 +6,7 @@ type
     conn: AsyncRedis
     taken: float
 
-  RedisPool = ref object
+  RedisPool* = ref object
     conns: seq[RedisConn]
     host: string
     port: Port
