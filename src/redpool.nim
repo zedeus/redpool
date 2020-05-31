@@ -6,7 +6,7 @@ type
     conn: AsyncRedis
     taken: float
 
-  RedisPool = ref object
+  RedisPool* = ref object
     conns: seq[RedisConn]
     host: string
     port: Port
@@ -42,28 +42,36 @@ proc acquire*(pool: RedisPool): Future[AsyncRedis] {.async.} =
   pool.conns.add newConn
   return newConn.conn
 
-proc release*(pool: RedisPool; conn: AsyncRedis) =
+proc release*(pool: RedisPool; conn: AsyncRedis) {.async.} =
   for i, rconn in pool.conns:
     if rconn.conn == conn:
       if pool.conns.len > pool.maxConns:
         pool.conns.del(i)
+        await conn.quit()
       else:
         rconn.taken = 0
       break
 
 template withAcquire*(pool: RedisPool; conn, body: untyped) =
-  let `conn` {.inject.} = waitFor pool.acquire()
-  try:
-    body
-  finally:
-    pool.release(`conn`)
+  when (NimMajor, NimMinor, NimPatch) >= (1, 3, 1):
+    let `conn` {.inject.} = await pool.acquire()
+    try:
+      body
+    finally:
+      await pool.release(`conn`)
+  else:
+    let `conn` {.inject.} = waitFor pool.acquire()
+    try:
+      body
+    finally:
+      waitFor pool.release(`conn`)
 
 when isMainModule:
   proc main {.async.} =
     let pool = await newRedisPool(1)
     let conn = await pool.acquire()
     echo await conn.ping()
-    pool.release(conn)
+    await pool.release(conn)
 
     pool.withAcquire(conn2):
       echo await conn2.ping()
