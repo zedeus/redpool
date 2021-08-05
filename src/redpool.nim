@@ -11,6 +11,7 @@ type
     host: string
     port: Port
     timeout: float
+    password: string
     maxConns: int
 
 proc newRedisConn(pool: RedisPool; taken=false): Future[RedisConn] {.async.} =
@@ -18,14 +19,18 @@ proc newRedisConn(pool: RedisPool; taken=false): Future[RedisConn] {.async.} =
     conn: await openAsync(pool.host, pool.port),
     taken: if taken: epochTime() else: 0
   )
+  
+  if (len(pool.password) != 0):
+    await result.conn.auth(pool.password)
 
 proc newRedisPool*(size: int; maxConns=10; timeout=10.0;
-                   host="localhost"; port=6379): Future[RedisPool] {.async.} =
+                   host="localhost"; port=6379; password=""): Future[RedisPool] {.async.} =
   result = RedisPool(
     maxConns: maxConns,
     host: host,
     port: Port(port),
-    timeout: timeout
+    timeout: timeout,
+    password: password
   )
 
   for n in 0 ..< size:
