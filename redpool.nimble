@@ -10,4 +10,4 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 1.2.0"
-requires "https://github.com/zedeus/redis#94bcbf1"
+requires "https://github.com/zedeus/redis#d0a0e6f"
