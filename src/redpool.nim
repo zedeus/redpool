@@ -47,10 +47,10 @@ proc acquire*(pool: RedisPool): Future[AsyncRedis] {.async.} =
   pool.conns.add newConn
   return newConn.conn
 
-proc release*(pool: RedisPool; conn: AsyncRedis) {.async.} =
+proc release*(pool: RedisPool; conn: AsyncRedis; drop=false) {.async.} =
   for i, rconn in pool.conns:
     if rconn.conn == conn:
-      if pool.conns.len > pool.maxConns:
+      if pool.conns.len > pool.maxConns or drop:
         pool.conns.del(i)
         await conn.quit()
       else:
@@ -58,18 +58,14 @@ proc release*(pool: RedisPool; conn: AsyncRedis) {.async.} =
       break
 
 template withAcquire*(pool: RedisPool; conn, body: untyped) =
-  when (NimMajor, NimMinor, NimPatch) >= (1, 3, 1):
-    let `conn` {.inject.} = await pool.acquire()
-    try:
-      body
-    finally:
-      await pool.release(`conn`)
-  else:
-    let `conn` {.inject.} = waitFor pool.acquire()
-    try:
-      body
-    finally:
-      waitFor pool.release(`conn`)
+  var badConnection = false
+  let `conn` {.inject.} = await pool.acquire()
+  try:
+    body
+  except ReplyError, RedisError:
+    badConnection = true
+  finally:
+    await pool.release(`conn`, badConnection)
 
 when isMainModule:
   proc main {.async.} =
