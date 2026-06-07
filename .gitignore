@@ -1,0 +1,6 @@
+nimble.develop
+nimble.paths
+nimble.lock
+nimbledeps
+config.nims
+src/redpool

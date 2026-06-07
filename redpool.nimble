@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.0"
+version       = "0.2.0"
 author        = "zedeus"
 description   = "Redis connection pool"
 license       = "MIT"
@@ -9,5 +9,5 @@ srcDir        = "src"
 
 # Dependencies
 
-requires "nim >= 1.4.8"
-requires "https://github.com/zedeus/redis#d0a0e6f"
+requires "nim >= 2.0.0"
+requires "https://github.com/zedeus/redis#v0.4.1"
