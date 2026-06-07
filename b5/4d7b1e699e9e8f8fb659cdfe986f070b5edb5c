@@ -1,0 +1,23 @@
+redpool.nimble
+  s_d09ebb1aa289e0::t_e1e0e7c1d2266d 3,12
+  s_d09ebb1aa289e0::t_8a7e69dd90bcff 13
+.gitignore
+  s_d09ebb1aa289e0::t_6423914f17db4c 3,5-6
+  s_d09ebb1aa289e0::t_8e7115663da8c6 1-2,4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "b54d7b1e699e9e8f8fb659cdfe986f070b5edb5c",
+  "prompts": {},
+  "sessions": {
+    "s_d09ebb1aa289e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a9064d9-0ccc-46d8-b850-b31cb27e9606",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Zed <zedeus@pm.me>"
+    }
+  }
+}
